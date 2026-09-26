@@ -7,7 +7,7 @@
 import type { FeatherId } from "@/data/featherConfig";
 import { featherById } from "@/data/featherConfig";
 import { analyticsConfig as cfg } from "./config";
-import { hasAnalyticsConsent } from "./consent";
+import { hasAnalyticsConsent, isDeviceExcluded, setDeviceExcluded } from "./consent";
 import { startDwell, type DwellTimer } from "./dwell";
 import type {
   AboutOpenMethod,
@@ -50,6 +50,20 @@ export function viewportCategory(): ViewportCategory {
 const reducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/** `?analytics=off` / `?analytics=on` marks this browser, then the parameter is removed from the URL. */
+function applyExclusionParam() {
+  try {
+    const url = new URL(window.location.href);
+    const v = url.searchParams.get("analytics");
+    if (v !== "off" && v !== "on") return;
+    setDeviceExcluded(v === "off");
+    url.searchParams.delete("analytics");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+  } catch {
+    /* non-critical */
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Session lifecycle (started once by <AnalyticsProvider>)
 // ---------------------------------------------------------------------------
@@ -58,6 +72,9 @@ let started = false;
 export function startAnalytics() {
   if (started || typeof window === "undefined") return;
   started = true;
+  applyExclusionParam();
+  // The owner's own browsers send nothing — PostHog isn't even loaded.
+  if (isDeviceExcluded()) return;
   try {
     const s = session.getSession();
     registerSuper({ sessionId: s.id });

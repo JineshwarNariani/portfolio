@@ -18,11 +18,21 @@ export const RANGES: { id: Range; label: string }[] = [
 ];
 export const parseRange = (v: unknown): Range => (RANGES.some((r) => r.id === v) ? (v as Range) : "7d");
 
+/**
+ * Local development traffic (NEXT_PUBLIC_ANALYTICS_ENABLE_DEV) never counts, and
+ * nothing before ANALYTICS_START (e.g. "2026-09-27T00:00:00Z") — a clean slate after launch testing.
+ */
+const START = process.env.ANALYTICS_START ?? "";
+const START_SQL = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:\d{2})?)?$/.test(START) && !Number.isNaN(Date.parse(START))
+  ? ` AND timestamp >= toDateTime('${new Date(START).toISOString().slice(0, 19).replace("T", " ")}', 'UTC')`
+  : "";
+const NOT_DEV = `NOT (toString(properties.$host) LIKE 'localhost%' OR toString(properties.$host) LIKE '127.0.0.1%')${START_SQL}`;
+
 const RANGE_SQL: Record<Range, string> = {
-  "24h": "timestamp >= now() - INTERVAL 1 DAY",
-  "7d": "timestamp >= now() - INTERVAL 7 DAY",
-  "30d": "timestamp >= now() - INTERVAL 30 DAY",
-  all: "1 = 1",
+  "24h": `timestamp >= now() - INTERVAL 1 DAY AND ${NOT_DEV}`,
+  "7d": `timestamp >= now() - INTERVAL 7 DAY AND ${NOT_DEV}`,
+  "30d": `timestamp >= now() - INTERVAL 30 DAY AND ${NOT_DEV}`,
+  all: NOT_DEV,
 };
 const list = (xs: readonly string[]) => xs.map((x) => `'${x}'`).join(", ");
 const OURS = list(ANALYTICS_EVENTS);
@@ -304,7 +314,7 @@ export function describeEvent(event: string, feather: string | null) {
 export async function getRecentActivity(limit = 25) {
   const rows = await hogql(
     `SELECT timestamp, event, toString(properties.featherId)
-     FROM events WHERE event IN (${list(ACTIVITY_EVENTS)}) AND timestamp >= now() - INTERVAL 30 DAY
+     FROM events WHERE event IN (${list(ACTIVITY_EVENTS)}) AND timestamp >= now() - INTERVAL 30 DAY AND ${NOT_DEV}
      ORDER BY timestamp DESC LIMIT ${Math.min(100, Math.max(1, Math.floor(limit)))}`,
     "activity",
   );

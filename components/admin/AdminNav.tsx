@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logout } from "@/app/admin/analytics/actions";
+import { ExcludeDeviceToggle } from "./ExcludeDeviceToggle";
 
 /** Shared header for the private admin pages. */
 export function AdminNav({ current }: { current: "analytics" | "guestbook" }) {
@@ -11,6 +12,7 @@ export function AdminNav({ current }: { current: "analytics" | "guestbook" }) {
       <Link href="/admin/guestbook" aria-current={current === "guestbook" ? "page" : undefined}>
         Guestbook
       </Link>
+      <ExcludeDeviceToggle />
       <form action={logout}>
         <button type="submit" className="admin-link">
           Sign out

@@ -123,3 +123,12 @@ strings or URL fragments, the raw user-agent string. `before_send` in
 - **Dwell times** (sections, About, Quick View, guest notes): a stopwatch that pauses
   whenever the tab is hidden (`lib/analytics/dwell.ts`). They are not paused for
   inactivity — someone reading a section without moving the mouse is still reading.
+
+## Excluding the owner's visits
+
+- A browser marked excluded never loads PostHog and sends nothing (`pk-analytics-exclude` in localStorage).
+  It is set automatically the first time an admin page is opened, toggled from the admin header
+  ("This browser: not tracked"), or set on any device by opening a page with `?analytics=off`
+  (`?analytics=on` reverses it). The parameter is removed from the URL immediately.
+- The dashboard ignores events from `localhost` / `127.0.0.1` (dev with `NEXT_PUBLIC_ANALYTICS_ENABLE_DEV`)
+  and, if set, everything before `ANALYTICS_START`.
