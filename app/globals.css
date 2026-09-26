@@ -1,0 +1,1247 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Tokens — drawn from the peacock artwork's own palette
+   ========================================================================== */
+@theme {
+  --color-paper: #fafaf7;
+  --color-ink: #1f2428;
+  --color-ink-soft: #4b5358;
+  --color-ink-faint: #6e757a;
+  --color-navy: #17345c;
+  --color-teal-deep: #155e63;
+  --color-teal: #1f7d78;
+  --color-sage: #86a982;
+  --color-mint: #d9e8c9;
+  /* Gold for lines/accents; the deeper gold passes contrast for small text. */
+  --color-gold: #a77a32;
+  --color-gold-text: #8a6425;
+
+  --font-serif: var(--font-instrument), "Instrument Serif", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow: hidden; /* the scene is the page; panels scroll inside themselves */
+}
+
+::selection {
+  background: var(--color-mint);
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   Header + INDEX
+   ========================================================================== */
+.site-header {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 clamp(1.1rem, 3vw, 2.25rem);
+  pointer-events: none;
+}
+.site-header > * {
+  pointer-events: auto;
+}
+.site-name {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  letter-spacing: 0.005em;
+  color: var(--color-gold-text);
+}
+
+.index {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+.index-util,
+.index-toggle {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+.index-util:hover,
+.index-util[aria-current="page"],
+.index-toggle:hover,
+.index-toggle[aria-expanded="true"] {
+  color: var(--color-gold-text);
+}
+.index-list {
+  position: absolute;
+  top: calc(100% + 0.9rem);
+  right: 0;
+  min-width: 13rem;
+  padding: 0.9rem 1.2rem 1rem;
+  background: var(--color-paper);
+  border-top: 1px solid var(--color-gold);
+}
+.index-list[data-open] {
+  animation: index-in 0.2s var(--ease-out);
+}
+.index-group {
+  margin: 0.2rem 0 0.25rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.index-group + ul + .index-group {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(31 36 40 / 0.08);
+}
+.index-other :is(a, button) {
+  font-size: 1.02rem !important;
+  color: var(--color-ink-soft) !important;
+}
+.index-list li button {
+  display: block;
+  padding: 0.28rem 0;
+  font-family: var(--font-serif);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.index-list li button:hover {
+  color: var(--color-gold-text) !important;
+}
+@media (max-width: 519px) {
+  .index { gap: 1rem; }
+  .index-resume { display: none; }
+}
+.index-list li a {
+  display: block;
+  padding: 0.28rem 0;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--color-ink);
+  transition: color 0.2s;
+}
+.index-list li a:hover,
+.index-list li a[aria-current="page"] {
+  color: var(--color-gold-text);
+}
+@keyframes index-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Scene
+   ========================================================================== */
+.scene {
+  position: fixed;
+  inset: 0;
+  /* Above the wind layer; only real targets take the pointer, so guest
+     feathers drifting behind the peacock stay catchable in open space. */
+  z-index: 1;
+  pointer-events: none;
+}
+.scene :is(.pk-feather, .pk-body, .panel) {
+  pointer-events: auto;
+}
+.scene-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+.scene[data-ready] .scene-svg {
+  opacity: 1;
+}
+
+.pk-decorative {
+  pointer-events: none;
+}
+.pk-feather,
+.pk-body {
+  cursor: pointer;
+  outline: none;
+}
+/* Only the resting peacock is clickable; everything else goes through the URL/INDEX. */
+.scene:not([data-state="idle"]):not([data-state="tailOpening"]) :is(.pk-feather, .pk-body) {
+  pointer-events: none;
+}
+
+.pk-outline,
+.pk-outline path {
+  fill: none;
+  stroke: var(--color-gold);
+  stroke-width: 1.25;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+.pk-feather:focus-visible .pk-outline,
+.pk-feather:focus-visible .pk-outline path,
+.pk-body:is(:hover, :focus-visible) .pk-outline {
+  opacity: 1;
+}
+
+/* Hover / focus labels */
+.labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.26s ease, translate 0.26s var(--ease-out);
+  translate: 0 3px;
+}
+.label[data-visible] {
+  opacity: 1;
+  translate: 0 0;
+}
+.label[data-align="start"] { transform: translate(0, -50%); }
+.label[data-align="end"] { transform: translate(-100%, -50%); align-items: flex-end; text-align: right; }
+.label[data-align="center"] { transform: translate(-50%, -50%); align-items: center; text-align: center; }
+.label[data-align="center"][data-above] { transform: translate(-50%, -100%); }
+.label-main {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+}
+.label-micro {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-ink-soft);
+}
+
+/* The line beneath the feet: "Pluck a feather", or "About" while on the chest. */
+.cue {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 0.66rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.cue > span {
+  display: block;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.cue-select {
+  color: var(--color-ink-faint);
+}
+.cue-about {
+  position: absolute;
+  inset: 0;
+  color: var(--color-gold-text);
+  transition-duration: 0.25s !important;
+}
+.cue[data-mode="select"] .cue-select,
+.cue[data-mode="about"] .cue-about {
+  opacity: 1;
+}
+
+/* Chest: a slight lift on hover/focus, and one gentle outline after the first unfurl. */
+.pk-body {
+  transform-box: fill-box;
+  transform-origin: 50% 60%;
+  transition: transform 0.3s var(--ease-out);
+}
+.pk-body:is(:hover, :focus-visible) {
+  transform: scale(1.018);
+}
+.scene[data-chest-hint] .pk-body .pk-outline {
+  opacity: 0.55;
+  transition-duration: 1.2s;
+}
+
+/* ==========================================================================
+   Section panel — an editorial spread beside the detached feather
+   ========================================================================== */
+.panel {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 17vh clamp(1.5rem, 8vw, 8rem) 12vh clamp(1rem, 2vw, 2rem);
+}
+.panel-inner {
+  max-width: 34rem;
+}
+@media (min-width: 700px) and (max-width: 1023px) {
+  .panel { left: 48%; padding-right: 2rem; }
+  .panel-inner { max-width: 26rem; }
+}
+@media (max-width: 699px) {
+  .panel {
+    left: 0;
+    top: calc(64px + 26vh);
+    padding: 1.6rem 1.4rem 5rem;
+    background: var(--color-paper);
+    border-top: 1px solid rgb(167 122 50 / 0.35);
+  }
+}
+
+.panel-return {
+  margin-bottom: 2.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.panel-return:hover {
+  color: var(--color-gold-text);
+}
+@media (max-width: 699px) {
+  .panel-return { margin-bottom: 1.4rem; }
+}
+.panel-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  outline: none;
+}
+.panel-micro {
+  margin-top: 0.4rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--color-ink-soft);
+}
+.panel-rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  margin: 1.4rem 0 0.4rem;
+  background: var(--color-gold);
+}
+.panel-intro {
+  margin-top: 1.6rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--color-ink-soft);
+}
+.entries {
+  margin-top: 0.6rem;
+}
+.entry {
+  padding-top: 2rem;
+}
+.entry[data-placeholder] {
+  opacity: 0.62;
+}
+.entry-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 2.4vw, 2rem);
+  line-height: 1.1;
+  color: var(--color-navy);
+}
+.entry-meta {
+  margin-top: 0.35rem;
+  font-size: 0.95rem;
+  color: var(--color-teal-deep);
+}
+.entry-body {
+  margin-top: 0.5rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--color-ink);
+}
+.entry-tags {
+  margin-top: 0.6rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.panel-note {
+  margin-top: 2.4rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--color-ink-faint);
+}
+.panel-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.8rem;
+  margin-top: 2rem;
+}
+.panel-links a {
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-color: rgb(167 122 50 / 0.45);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.2s, color 0.2s;
+}
+.panel-links a:hover {
+  color: var(--color-gold-text);
+  text-decoration-color: var(--color-gold);
+}
+
+/* About */
+.about-name {
+  margin-top: 1.6rem;
+  font-family: var(--font-serif);
+  font-size: clamp(2.4rem, 4.4vw, 3.6rem);
+  line-height: 1;
+  color: var(--color-gold-text);
+}
+.about-roles {
+  margin-top: 1rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-navy);
+}
+.about-summary {
+  margin-top: 1.6rem;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+}
+
+/* ==========================================================================
+   Small print
+   ========================================================================== */
+.credit {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: #8e9498;
+  transition: opacity 0.3s;
+}
+/* Hidden while a section or About is open, so it never sits over content. */
+body:has(.scene:not([data-state="idle"])) .credit {
+  opacity: 0;
+}
+.noscript-index {
+  position: fixed;
+  inset: auto 0 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 1.6rem;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.15s !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ==========================================================================
+   Footer: credit (left) · flute (right)
+   ========================================================================== */
+.site-footer {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(1.1rem, 3vw, 2.25rem) 0.8rem;
+  pointer-events: none;
+}
+.site-footer > * {
+  pointer-events: auto;
+}
+.flute-control {
+  padding: 0.35rem 0 0.35rem 0.6rem;
+  background: var(--color-paper);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.flute-control:hover,
+.flute-control[data-on] {
+  color: var(--color-gold-text);
+}
+.flute-state {
+  letter-spacing: 0.12em;
+}
+
+/* ==========================================================================
+   Guestbook: loose feathers on the wind
+   ========================================================================== */
+@keyframes guest-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.guest-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.guest-field[data-dimmed] {
+  opacity: 0.16;
+}
+.guest-field-appear {
+  animation: guest-appear 1.2s ease-out 2.4s both;
+}
+.guest-feather {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* Hit-area padding and centring margins are set inline (GuestFeatherField). */
+  border-radius: 40px;
+  opacity: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  will-change: transform, opacity;
+}
+.guest-field[data-dimmed] .guest-feather {
+  pointer-events: none;
+}
+.guest-feather:focus-visible {
+  outline: 1px solid var(--color-gold);
+  outline-offset: 0;
+}
+.guest-feather-art {
+  display: block;
+}
+
+@keyframes note-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.guest-note {
+  position: fixed;
+  z-index: 50;
+  padding: 1.2rem 1.35rem 1.1rem;
+  background: var(--color-paper);
+  border: 1px solid rgb(31 36 40 / 0.08);
+  animation: note-in 0.3s var(--ease-out);
+}
+.guest-note[data-sheet] {
+  inset: auto 0 0;
+  padding: 1.4rem 1.4rem 2rem;
+  border-width: 1px 0 0;
+}
+.guest-note-rule {
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  margin-bottom: 0.9rem;
+  background: var(--color-gold);
+}
+.guest-note-from {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  outline: none;
+}
+.guest-note-message {
+  margin-top: 0.7rem;
+  font-family: var(--font-serif);
+  font-size: 1.28rem;
+  line-height: 1.35;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+.guest-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  margin-top: 1.1rem;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.guest-note-actions :is(a, button) {
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.guest-note-actions :is(a, button):hover {
+  color: var(--color-gold-text);
+}
+.guest-note-actions .guest-note-leave {
+  margin-left: auto;
+}
+
+/* Leave a feather */
+.leave-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(250 250 247 / 0.78);
+  animation: guest-appear 0.25s ease-out;
+}
+.leave-sheet {
+  width: min(100%, 26rem);
+  padding: 1.6rem 1.6rem 1.4rem;
+  background: var(--color-paper);
+  border: 1px solid rgb(31 36 40 / 0.08);
+  animation: note-in 0.3s var(--ease-out);
+}
+@media (max-width: 699px) {
+  .leave-veil { place-items: end stretch; padding: 0; }
+  .leave-sheet { width: 100%; padding-bottom: 2rem; border-width: 1px 0 0; }
+}
+.leave-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  color: var(--color-navy);
+}
+.leave-intro {
+  margin-top: 0.4rem;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+}
+.leave-field {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 1.15rem;
+}
+.leave-field > span:first-child {
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.leave-field em {
+  margin-left: 0.4rem;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.leave-field :is(input, textarea) {
+  width: 100%;
+  padding: 0.4rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(31 36 40 / 0.2);
+  background: transparent;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--color-ink);
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+}
+.leave-field :is(input, textarea):focus {
+  border-bottom-color: var(--color-gold);
+}
+.leave-field [aria-invalid="true"] {
+  border-bottom-color: #9b3b2e;
+}
+.leave-count {
+  font-size: 0.74rem;
+  color: var(--color-ink-faint);
+}
+.leave-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+  margin-top: 1.6rem;
+}
+.leave-submit {
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--color-gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.leave-submit:hover {
+  background: var(--color-gold);
+  color: var(--color-paper);
+}
+.leave-submit:disabled {
+  opacity: 0.5;
+}
+.leave-cancel {
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  cursor: pointer;
+}
+.leave-sent {
+  margin-top: 1rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.3rem;
+  color: var(--color-teal-deep);
+}
+.panel-leave {
+  margin-top: 2.2rem;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--color-ink-faint);
+}
+.panel-leave button {
+  color: var(--color-gold-text);
+  text-decoration: underline;
+  text-decoration-color: rgb(167 122 50 / 0.45);
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Recruiter Quick View
+   ========================================================================== */
+.quick-view {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow-y: auto;
+  background: var(--color-paper);
+  animation: guest-appear 0.3s ease-out;
+}
+.qv-inner {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem clamp(1.2rem, 4vw, 3rem) 5rem;
+}
+.qv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 3rem;
+}
+.qv-back {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.qv-back:hover {
+  color: var(--color-gold-text);
+}
+.qv-kicker {
+  font-size: 0.64rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+}
+.qv-head {
+  margin-top: clamp(2rem, 7vh, 4rem);
+}
+.qv-head h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 1;
+  color: var(--color-gold-text);
+  outline: none;
+}
+.qv-roles {
+  margin-top: 0.9rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-navy);
+}
+.qv-summary {
+  max-width: 40rem;
+  margin-top: 1.4rem;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+.qv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.6rem 3.5rem;
+  margin-top: clamp(2.4rem, 6vh, 3.5rem);
+}
+@media (max-width: 699px) {
+  .qv-grid { grid-template-columns: 1fr; gap: 2.2rem; }
+}
+.qv-group h2 {
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid rgb(167 122 50 / 0.45);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+}
+.qv-group li {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.85rem;
+}
+.qv-item {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  line-height: 1.15;
+  color: var(--color-navy);
+}
+.qv-detail {
+  font-size: 0.9rem;
+  color: var(--color-ink-soft);
+}
+.qv-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.5rem;
+}
+.qv-links a {
+  font-size: 1rem;
+  text-decoration: underline;
+  text-decoration-color: rgb(167 122 50 / 0.45);
+  text-underline-offset: 0.3em;
+}
+.qv-links a:hover {
+  color: var(--color-gold-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-field-appear { animation-delay: 0s !important; }
+}
+
+/* Footer privacy link */
+.credit-link {
+  text-decoration: underline;
+  text-decoration-color: rgb(142 148 152 / 0.5);
+  text-underline-offset: 0.2em;
+}
+.credit-link:hover {
+  color: var(--color-gold-text);
+}
+
+/* ==========================================================================
+   Plain pages (privacy) — ordinary scrolling documents
+   ========================================================================== */
+.plain-page {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--color-paper);
+}
+.plain-inner {
+  max-width: 38rem;
+  margin: 0 auto;
+  padding: 2rem 1.4rem 5rem;
+}
+.plain-inner h1 {
+  margin: 3rem 0 1.4rem;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 3.4rem);
+  color: var(--color-gold-text);
+}
+.plain-inner p {
+  margin-top: 1.1rem;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Private analytics dashboard
+   ========================================================================== */
+.admin {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+.admin-inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2.2rem clamp(1rem, 4vw, 2.5rem) 5rem;
+}
+.admin h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: 2.6rem;
+  color: var(--color-gold-text);
+}
+.admin h2 {
+  margin: 2.6rem 0 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgb(167 122 50 / 0.4);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+}
+.admin-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.admin-muted {
+  color: var(--color-ink-faint);
+  font-size: 0.92rem;
+}
+.admin-note {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--color-ink-faint);
+}
+.admin-error {
+  margin: 1rem 0;
+  font-size: 0.92rem;
+  color: #9b3b2e;
+}
+.admin code {
+  font-size: 0.85em;
+  padding: 0.05rem 0.3rem;
+  background: rgb(31 36 40 / 0.05);
+}
+.admin-link {
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-decoration-color: rgb(167 122 50 / 0.45);
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+}
+.admin-link:hover {
+  color: var(--color-gold-text);
+}
+.admin-ranges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  margin-top: 1.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.admin-ranges a {
+  color: var(--color-ink-faint);
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid transparent;
+}
+.admin-ranges a[aria-current="page"] {
+  color: var(--color-gold-text);
+  border-bottom-color: var(--color-gold);
+}
+.admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 1.4rem 2rem;
+}
+.admin-metrics dt {
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.admin-metrics dd {
+  margin-top: 0.3rem;
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1.05;
+  color: var(--color-navy);
+}
+.admin-two {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 0 3rem;
+}
+@media (max-width: 800px) {
+  .admin-two { grid-template-columns: 1fr; }
+}
+.admin-chart svg {
+  display: block;
+  width: 100%;
+  height: 11rem;
+}
+.admin-bar {
+  fill: var(--color-teal);
+  opacity: 0.8;
+}
+.admin-bar-accent {
+  fill: var(--color-gold);
+}
+.admin-chart figcaption {
+  display: flex;
+  margin-top: 0.35rem;
+  font-size: 0.66rem;
+  color: var(--color-ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.admin-activity li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgb(31 36 40 / 0.06);
+  font-size: 0.92rem;
+}
+.admin-activity time {
+  display: inline-block;
+  min-width: 4.8rem;
+  color: var(--color-ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.admin-table th {
+  padding: 0.5rem 0.8rem 0.5rem 0;
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-align: left;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.admin-table td {
+  position: relative;
+  padding: 0.6rem 0.8rem 0.6rem 0;
+  border-top: 1px solid rgb(31 36 40 / 0.07);
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+}
+.admin-bar-inline {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--color-sage);
+}
+.admin-journey {
+  color: var(--color-navy);
+}
+.admin-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+}
+.admin-login {
+  max-width: 22rem;
+  margin: 18vh auto 0;
+  padding: 0 1.2rem;
+}
+.admin-login label {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1.8rem;
+}
+.admin-login label span {
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+.admin-login input {
+  padding: 0.5rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(31 36 40 / 0.25);
+  background: transparent;
+  font: inherit;
+  outline: none;
+}
+.admin-login input:focus {
+  border-bottom-color: var(--color-gold);
+}
+.admin-login button {
+  margin-top: 1.6rem;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid var(--color-gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  cursor: pointer;
+}
+.admin-login button:hover {
+  background: var(--color-gold);
+  color: var(--color-paper);
+}
+@media (max-width: 800px) {
+  .admin-table { display: block; overflow-x: auto; white-space: nowrap; }
+}
+
+/* Guestbook honeypot: invisible to people and screen readers, filled only by bots. */
+.leave-honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Admin: shared nav + guestbook moderation */
+.admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-bottom: 1.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.admin-nav a {
+  color: var(--color-ink-faint);
+}
+.admin-nav a[aria-current="page"] {
+  color: var(--color-gold-text);
+}
+.admin-nav form {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85rem;
+}
+.admin-notes li {
+  padding: 1.1rem 0;
+  border-top: 1px solid rgb(31 36 40 / 0.08);
+}
+.admin-note-message {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.admin-note-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+}
+.admin-btn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgb(31 36 40 / 0.2);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+}
+.admin-btn:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold-text);
+}
+.admin-btn-primary {
+  border-color: var(--color-gold);
+  color: var(--color-gold-text);
+}
+
+/* Project links + About details */
+.entry-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1.1rem;
+  margin-top: 0.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.entry-links a {
+  color: var(--color-gold-text);
+  transition: color 0.2s;
+}
+.entry-links a:hover {
+  color: var(--color-navy);
+}
+.about-para {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--color-ink-soft);
+}
+.about-edu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin-top: 1.8rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgb(167 122 50 / 0.35);
+  font-size: 0.93rem;
+}
+.about-edu-school {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: var(--color-navy);
+}
+.about-edu-detail {
+  font-size: 0.82rem;
+  color: var(--color-ink-faint);
+}
+.about-more-toggle {
+  margin-top: 1.6rem;
+  padding: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-gold-text);
+  transition: color 0.2s;
+}
+.about-more-toggle:hover {
+  color: var(--color-navy);
+}
+.about-more-toggle:focus-visible {
+  outline: 1px solid var(--color-gold-text);
+  outline-offset: 4px;
+}
+.about-more:not([hidden]) {
+  animation: about-more-in 0.35s ease-out;
+}
+@keyframes about-more-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-more:not([hidden]) {
+    animation: none;
+  }
+}

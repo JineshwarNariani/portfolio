@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- A peacock eye in the artwork's palette. -->
+  <rect width="32" height="32" rx="7" fill="#FAFAF7"/>
+  <g transform="rotate(-90 16 16)">
+    <path d="M4 16 C 9 7, 23 7, 28 16 C 23 25, 9 25, 4 16 Z" fill="#1B474D"/>
+    <path d="M7.5 16 C 11 10, 21 10, 24.5 16 C 21 22, 11 22, 7.5 16 Z" fill="#D9E8C9"/>
+    <circle cx="17.5" cy="16" r="4.2" fill="#1B474D"/>
+    <circle cx="17.5" cy="16" r="2.6" fill="#20323C"/>
+  </g>
+</svg>

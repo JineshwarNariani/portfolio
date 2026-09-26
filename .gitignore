@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+.DS_Store
+.env*.local
+.env
+.vercel
+
+# Local-only sources: Freepik originals (licence forbids redistributing the
+# source files), the raw guest-feather image, and unrelated old work.
+/creative-peacock-design/
+/feather.png
+/1CLASS-HTML/
+/.claude/
