@@ -1245,3 +1245,16 @@ body:has(.scene:not([data-state="idle"])) .credit {
     animation: none;
   }
 }
+
+/* Server-rendered text edition of each page (search engines, no-JS, screen readers). */
+.seo-doc {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

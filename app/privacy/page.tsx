@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Privacy — Jineshwar Nariani" };
+export const metadata: Metadata = {
+  title: "Privacy — Jineshwar Nariani",
+  description: "How jineshwarnariani.com handles analytics and guestbook notes: anonymous, no referrers, no IP addresses stored.",
+  alternates: { canonical: "/privacy" },
+};
 
 /** Plain-language note about analytics. Keep in sync with docs/analytics-events.md. */
 export default function Privacy() {
