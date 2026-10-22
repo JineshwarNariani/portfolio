@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 import { profile, quickView } from "@/data/portfolioData";
+import { VIEW_IDS, VIEWS_ENABLED, views, type ViewId } from "@/data/views";
 import { TrackedLink } from "@/components/analytics/TrackedLink";
 import { hasNavigatedInApp, useBackToPeacock } from "@/hooks/useInAppBack";
 import { trackQuickViewClosed, trackQuickViewOpened } from "@/lib/analytics/analytics";
@@ -15,7 +17,10 @@ let pendingClose: number | null = null;
  * Recruiter Quick View: a plain editorial one-pager over the peacock.
  * The peacock stays mounted underneath, so "Back" returns without replaying anything.
  */
-export function QuickView() {
+export function QuickView({ view }: { view?: ViewId }) {
+  const active = VIEWS_ENABLED ? view : undefined;
+  // The view Quick View was opened on; switching views while open isn't a new open.
+  const openedOn = useRef<ViewId | "all">(active ?? "all");
   const backRef = useRef<() => void>(() => {});
   const goBack = useBackToPeacock();
   const heading = useRef<HTMLHeadingElement>(null);
@@ -39,7 +44,7 @@ export function QuickView() {
     } else {
       // Landed here directly (first page of the visit) vs. an in-app navigation.
       const fallback: QuickViewOpenMethod = hasNavigatedInApp() ? "browser_nav" : "direct_route";
-      trackQuickViewOpened(takeIntent<QuickViewOpenMethod>("open") ?? fallback);
+      trackQuickViewOpened(takeIntent<QuickViewOpenMethod>("open") ?? fallback, openedOn.current);
     }
     return () => {
       pendingClose = window.setTimeout(() => {
@@ -64,23 +69,46 @@ export function QuickView() {
             {profile.name}
           </h1>
           <p className="qv-roles">{profile.roles.join(" · ")}</p>
-          <p className="qv-summary">{profile.summary}</p>
+          <p className="qv-summary">{active ? views[active].summary : profile.summary}</p>
+          {VIEWS_ENABLED && (
+            <nav className="qv-views" aria-label="View by interest">
+              {/* replace: switching views doesn't stack history, so Back still returns to the peacock. */}
+              <Link href="/quick-view" replace scroll={false} aria-current={!active ? "page" : undefined}>
+                All
+              </Link>
+              {VIEW_IDS.map((id) => (
+                <Link key={id} href={`/for/${id}`} replace scroll={false} aria-current={active === id ? "page" : undefined}>
+                  {views[id].label}
+                </Link>
+              ))}
+            </nav>
+          )}
         </header>
 
         <div className="qv-grid">
-          {quickView.groups.map((g) => (
-            <section key={g.title} className="qv-group" aria-label={g.title}>
-              <h2>{g.title}</h2>
-              <ul>
-                {g.items.map((it) => (
-                  <li key={it.name}>
-                    <span className="qv-item">{it.name}</span>
-                    <span className="qv-detail">{it.detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+          {quickView.groups.map((g) => {
+            const items = active ? g.items.filter((it) => it.views.includes(active)) : g.items;
+            if (items.length === 0) return null;
+            return (
+              <section key={g.title} className="qv-group" aria-label={g.title}>
+                <h2>{g.title}</h2>
+                <ul>
+                  {items.map((it) => {
+                    const also = active && it.views.length < VIEW_IDS.length ? it.views.filter((v) => v !== active) : [];
+                    return (
+                      <li key={it.name}>
+                        <span className="qv-item">{it.name}</span>
+                        <span className="qv-detail">{(active && it.byView?.[active]) || it.detail}</span>
+                        {also.length > 0 && (
+                          <span className="qv-also">Also in {also.map((v) => views[v].label).join(", ")}</span>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            );
+          })}
           <section className="qv-group" aria-label="Links">
             <h2>Links</h2>
             <ul className="qv-links">

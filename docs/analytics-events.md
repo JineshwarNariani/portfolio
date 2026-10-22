@@ -76,7 +76,7 @@ strings or URL fragments, the raw user-agent string. `before_send` in
 
 ### `quick_view_opened` / `quick_view_closed`
 **When:** `/quick-view` mounts / unmounts.
-**Properties:** opened — `openMethod`; closed — `dwellTimeMs`, `resumeClickedWhileOpen`, `externalLinkClickedWhileOpen`, `closeMethod`.
+**Properties:** opened — `openMethod`, `view` (`all` · `research` · `engineering` · `fde` — the audience view it opened on; switching views while open is not a new open); closed — `dwellTimeMs`, `resumeClickedWhileOpen`, `externalLinkClickedWhileOpen`, `closeMethod`.
 
 ## Links (destination URLs are never sent)
 

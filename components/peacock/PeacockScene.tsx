@@ -205,7 +205,8 @@ export function PeacockScene() {
   }, [vp, values]);
 
   // --- Label tour: titles cycle round the fan while the peacock rests -------------
-  const resting = state.type === "idle" && hover === null;
+  // Only on the peacock itself — not behind Quick View.
+  const resting = state.type === "idle" && hover === null && pathname === "/";
   const touringId = resting && tour !== null ? interactiveFeathers[tour].id : null;
   const tourStarted = useRef(false);
   useEffect(() => {

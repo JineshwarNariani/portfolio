@@ -220,12 +220,12 @@ export function trackAboutClosed(closeMethod: CloseMethod) {
 // ---------------------------------------------------------------------------
 let quickView: { dwell: DwellTimer; clicks: { resume: number; external: number } } | null = null;
 
-export function trackQuickViewOpened(openMethod: QuickViewOpenMethod) {
+export function trackQuickViewOpened(openMethod: QuickViewOpenMethod, view: EventMap["quick_view_opened"]["view"]) {
   if (quickView) return;
   session.recordSection("quick_view");
   session.setCurrentSection("quick_view");
   quickView = { dwell: startDwell(), clicks: session.linkClickCounts() };
-  track("quick_view_opened", { openMethod });
+  track("quick_view_opened", { openMethod, view });
 }
 
 export function trackQuickViewClosed(closeMethod: CloseMethod) {

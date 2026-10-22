@@ -1262,3 +1262,33 @@ body:has(.scene:not([data-state="idle"])) .credit {
   white-space: nowrap;
   border: 0;
 }
+
+/* Quick View: audience views (data/views.ts) */
+.qv-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.4rem;
+  margin-top: 1.4rem;
+}
+.qv-views a {
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid transparent;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  transition: color 0.2s, border-color 0.2s;
+}
+.qv-views a:hover {
+  color: var(--color-navy);
+}
+.qv-views a[aria-current="page"] {
+  color: var(--color-gold-text);
+  border-bottom-color: var(--color-gold-text);
+}
+.qv-also {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  color: var(--color-ink-faint);
+}

@@ -41,7 +41,7 @@ export interface EventMap {
   portfolio_feather_closed: { featherId: FeatherId; sectionName: string; dwellTimeMs: number; closeMethod: CloseMethod };
   about_opened: { openMethod: AboutOpenMethod; route: string };
   about_closed: { dwellTimeMs: number; closeMethod: CloseMethod };
-  quick_view_opened: { openMethod: QuickViewOpenMethod };
+  quick_view_opened: { openMethod: QuickViewOpenMethod; view: "all" | "research" | "engineering" | "fde" };
   quick_view_closed: {
     dwellTimeMs: number;
     resumeClickedWhileOpen: boolean;

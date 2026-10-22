@@ -2,6 +2,7 @@ import Link from "next/link";
 import { featherById, interactiveFeathers, type FeatherId } from "@/data/featherConfig";
 import { profile, sections, type Entry } from "@/data/portfolioData";
 import { pageDescriptions } from "@/data/seo";
+import { VIEW_IDS, VIEWS_ENABLED, views } from "@/data/views";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -46,6 +47,12 @@ function Home() {
         <li>
           <Link href="/quick-view">Quick View</Link> — {pageDescriptions.quickView}
         </li>
+        {VIEWS_ENABLED &&
+          VIEW_IDS.map((id) => (
+            <li key={id}>
+              <Link href={`/for/${id}`}>{views[id].label}</Link> — {views[id].description}
+            </li>
+          ))}
       </ul>
       <PersonJsonLd />
     </>

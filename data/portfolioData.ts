@@ -1,4 +1,5 @@
 import type { FeatherId } from "./featherConfig";
+import type { ViewId } from "./views";
 
 /**
  * All portfolio copy. Sourced from Jineshwar's resumes, project write-ups and
@@ -329,55 +330,185 @@ export const sections: Record<FeatherId, SectionContent> = {
 /**
  * Recruiter Quick View — everything important in ~20 seconds.
  */
-export const quickView = {
+export interface QuickViewItem {
+  name: string;
+  /** Shown in the "All" view, and in any view without its own line. */
+  detail: string;
+  /** Audience views this entry appears in (it always appears in "All"). */
+  views: readonly ViewId[];
+  /** The same entry described for a particular reader. */
+  byView?: Partial<Record<ViewId, string>>;
+}
+
+const EVERY: readonly ViewId[] = ["research", "engineering", "fde"];
+
+export const quickView: { groups: { title: string; items: QuickViewItem[] }[]; links: { label: string; href: string }[] } = {
   groups: [
     {
       title: "Selected Experience",
       items: [
-        { name: "PRISM — NSF Research", detail: "AI Software Engineer · 2025–2026 · Agents, LangGraph, n8n, MCP, RAG, Evals" },
-        { name: "Manning CICS", detail: "Undergraduate Researcher · 2025–2026 · Multi-Agent RL, AIRL, PyTorch, LLMs, Finance" },
-        { name: "UMass Math & Stats REU", detail: "Summer 2025 · Time Series, Statistics, Economics, Machine Learning, Data Science" },
-        { name: "Sky Governance", detail: "Backend Engineer · Summer 2024 · Microservices, Databases, AWS, Azure, GCP, RAFT" },
-        { name: "Accurate Industrial Controls", detail: "ML Intern · Summer 2023 · TensorFlow, MATLAB, SciPy, NumPy, Machine Learning, Robotics" },
-        { name: "Workmark", detail: "Co-Founder · Verified Work Portfolios for CS Students" },
+        {
+          name: "PRISM — NSF Research",
+          detail: "AI Software Engineer · 2025–2026 · Agents, LangGraph, n8n, MCP, RAG, Evals",
+          views: EVERY,
+          byView: {
+            research: "2025–2026 · Multi-Agent LLM Systems for Four Research Labs · Retrieval-Grounded Answers, Benchmarked Retrieval",
+            engineering: "AI Software Engineer · 2025–2026 · LangGraph Agents, MCP Servers, RAG, Feature-Flagged Evals, Docker",
+            fde: "Forward-Deployed Across Four Labs · One Agent Framework, Re-Pointed at Each Lab’s Data and Workflow",
+          },
+        },
+        {
+          name: "Manning CICS",
+          detail: "Undergraduate Researcher · 2025–2026 · Multi-Agent RL, AIRL, PyTorch, LLMs, Finance",
+          views: ["research"],
+          byView: { research: "Undergraduate Researcher · Financial RL + LLMs for Portfolio Optimisation · IEEE IDS 2025 Proposal · AIRL" },
+        },
+        {
+          name: "UMass Math & Stats REU",
+          detail: "Summer 2025 · Time Series, Statistics, Economics, Machine Learning, Data Science",
+          views: ["research"],
+          byView: { research: "Summer 2025 · Tariff-Policy Forecasting · Co-Authored Paper · +27% Over Deep-Learning Baselines" },
+        },
+        {
+          name: "Sky Governance",
+          detail: "Backend Engineer · Summer 2024 · Microservices, Databases, AWS, Azure, GCP, RAFT",
+          views: ["engineering"],
+        },
+        {
+          name: "Accurate Industrial Controls",
+          detail: "ML Intern · Summer 2023 · TensorFlow, MATLAB, SciPy, NumPy, Machine Learning, Robotics",
+          views: ["engineering"],
+        },
+        {
+          name: "Workmark",
+          detail: "Co-Founder · Verified Work Portfolios for CS Students",
+          views: ["fde", "engineering"],
+          byView: {
+            fde: "Co-Founder · Initial Funding, C-Corp, Early Users From UMass and Other Massachusetts Universities",
+            engineering: "Co-Founder · Building the Verified-Portfolio Platform",
+          },
+        },
       ],
     },
     {
       title: "Selected Projects",
       items: [
-        { name: "ClaimCheck", detail: "Live App · Claude, RAG, Grounding, Firecrawl, TypeScript, Evals" },
-        { name: "Recruiter Search", detail: "Next.js, Supabase, PostgreSQL RLS, Stripe, Claude Structured Outputs" },
-        { name: "Kausal", detail: "Computer Vision, World Models, Permutation Testing, PyTorch" },
-        { name: "Model’s-Eye Transcoding", detail: "VLMs, Qwen3-VL, FFmpeg, Statistical Testing, Cost Modelling" },
-        { name: "Clause", detail: "Best Use of AI Winner · Snowflake Cortex RAG, Gemini, FastAPI, MCP, Solana" },
-        { name: "Maple AI", detail: "Best AI Project with Databricks Winner · Hume EVI, Databricks, LangChain, Next.js" },
-        { name: "EchoHands", detail: "Two Awards at HackHer · MediaPipe, PyTorch, TensorFlow, RAG, Next.js" },
-        { name: "GritHub", detail: "Amazon Bedrock, VLM, Hume EVI 2, FastAPI, MongoDB" },
-        { name: "Artsee", detail: "Fetch.ai uAgents, Agentverse, Computer Vision, VLMs, Claude, Groq" },
-        { name: "AISH", detail: "CUhackit 2025 · LangChain, Hume AI, Perplexity, CUDA, Flask" },
-        { name: "LLM 10-K Analysis", detail: "OpenAI GPT, Chunking, sec-edgar-downloader, FastAPI, Plotly, D3" },
+        {
+          name: "ClaimCheck",
+          detail: "Live App · Claude, RAG, Grounding, Firecrawl, TypeScript, Evals",
+          views: ["engineering", "fde"],
+          byView: {
+            engineering: "Live App · Claude, RAG, Word-for-Word Quote Grounding, Background Jobs, RBAC, Evals",
+            fde: "Built for GTM Teams · Checks Launch Posts and AI Answers Against the Product’s Own Docs",
+          },
+        },
+        {
+          name: "Recruiter Search",
+          detail: "Next.js, Supabase, PostgreSQL RLS, Stripe, Claude Structured Outputs",
+          views: ["engineering"],
+        },
+        {
+          name: "Kausal",
+          detail: "Computer Vision, World Models, Permutation Testing, PyTorch",
+          views: ["research", "engineering"],
+          byView: {
+            research: "Causality Tests for World-Model Data · Permutation Tests + FDR · 100% Desync Detection vs 0–30%",
+            engineering: "Kuration SDK Operator · Parallel Corpus Scan · Python, PyTorch, FFmpeg",
+          },
+        },
+        {
+          name: "Model’s-Eye Transcoding",
+          detail: "VLMs, Qwen3-VL, FFmpeg, Statistical Testing, Cost Modelling",
+          views: ["research", "engineering"],
+          byView: {
+            research: "VLM-Aware Compression · 2,160 VLM Answers · Bootstrap and McNemar Tests Against a Noise Floor",
+            engineering: "Video Pipeline · 18% of Original Size, 6.4× Cheaper Reads · FFmpeg, MLX, Cost Model",
+          },
+        },
+        {
+          name: "Clause",
+          detail: "Best Use of AI Winner · Snowflake Cortex RAG, Gemini, FastAPI, MCP, Solana",
+          views: ["engineering", "fde"],
+          byView: { fde: "Best Use of AI Winner · Turns Tenant and Patient Rights Into a Usable Product, With a Live Chrome Extension" },
+        },
+        {
+          name: "Maple AI",
+          detail: "Best AI Project with Databricks Winner · Hume EVI, Databricks, LangChain, Next.js",
+          views: ["engineering"],
+        },
+        {
+          name: "EchoHands",
+          detail: "Two Awards at HackHer · MediaPipe, PyTorch, TensorFlow, RAG, Next.js",
+          views: ["engineering"],
+        },
+        { name: "GritHub", detail: "Amazon Bedrock, VLM, Hume EVI 2, FastAPI, MongoDB", views: ["engineering"] },
+        { name: "Artsee", detail: "Fetch.ai uAgents, Agentverse, Computer Vision, VLMs, Claude, Groq", views: ["engineering"] },
+        { name: "AISH", detail: "CUhackit 2025 · LangChain, Hume AI, Perplexity, CUDA, Flask", views: ["engineering"] },
+        {
+          name: "LLM 10-K Analysis",
+          detail: "OpenAI GPT, Chunking, sec-edgar-downloader, FastAPI, Plotly, D3",
+          views: ["engineering", "research"],
+          byView: { research: "LLM Analysis of SEC 10-K Filings, 1995–2023 · Risk, Management Discussion and Sentiment Trends" },
+        },
       ],
     },
     {
       title: "Research",
       items: [
-        { name: "Honors Thesis", detail: "Multi-Agent RL, Adversarial Detection, Market Microstructure, Bayesian Inference" },
-        { name: "PRISM", detail: "Agentic Systems, LangGraph, MCP, RAG, Evals" },
-        { name: "Financial RL", detail: "Paper Proposal Accepted at IEEE IDS 2025 · MARL, AIRL, Portfolio Optimization" },
-        { name: "Tariff-Policy Forecasting", detail: "Co-Authored Paper · VMD-LSTM, Granger Causality, Time Series, Forecasting" },
-        { name: "Kan Extensions for Causal Transfer", detail: "Category Theory, Causal Inference, LLMs, HPC" },
-        { name: "Program Synthesis vs. LLMs", detail: "Program Synthesis, Rosette, LLM Evaluation" },
+        {
+          name: "Honors Thesis",
+          detail: "Multi-Agent RL, Adversarial Detection, Market Microstructure, Bayesian Inference",
+          views: ["research"],
+          byView: { research: "Strategic Deception in Financial Markets · Bayesian Detector Beat Deep RL (99.5%) Until the Investor Adapted" },
+        },
+        {
+          name: "Financial RL",
+          detail: "Paper Proposal Accepted at IEEE IDS 2025 · MARL, AIRL, Portfolio Optimization",
+          views: ["research"],
+        },
+        {
+          name: "Tariff-Policy Forecasting",
+          detail: "Co-Authored Paper · VMD-LSTM, Granger Causality, Time Series, Forecasting",
+          views: ["research"],
+        },
+        {
+          name: "Kan Extensions for Causal Transfer",
+          detail: "Category Theory, Causal Inference, LLMs, HPC",
+          views: ["research"],
+        },
+        {
+          name: "Program Synthesis vs. LLMs",
+          detail: "Program Synthesis, Rosette, LLM Evaluation",
+          views: ["research"],
+        },
       ],
     },
     {
       title: "Education & Honours",
       items: [
-        { name: "UMass Amherst", detail: "B.S. Computer Science & Mathematics (Statistics) · GPA 3.86 · 2026" },
-        { name: "Dean’s List", detail: "All Eight Semesters · Commonwealth Honors College" },
-        { name: "Scholarships", detail: "Chancellor’s Award · Dean’s Merit Scholarship · Dean’s International Scholarship" },
-        { name: "Student Speaker", detail: "Manning CICS 2026 Graduation Ceremony" },
-        { name: "ASA DataFest 2026", detail: "Best in Group" },
-        { name: "Hackathons", detail: "10+ Hackathons · 4 Awards" },
+        { name: "UMass Amherst", detail: "B.S. Computer Science & Mathematics (Statistics) · GPA 3.86 · 2026", views: EVERY },
+        { name: "Dean’s List", detail: "All Eight Semesters · Commonwealth Honors College", views: EVERY },
+        {
+          name: "Scholarships",
+          detail: "Chancellor’s Award · Dean’s Merit Scholarship · Dean’s International Scholarship",
+          views: EVERY,
+        },
+        { name: "Student Speaker", detail: "Manning CICS 2026 Graduation Ceremony", views: EVERY },
+        {
+          name: "ASA DataFest 2026",
+          detail: "Best in Group",
+          views: ["research", "fde"],
+          byView: {
+            research: "Best in Group · 7.7M Patient Encounters · Disproved Our Own Hypothesis, Found a 3.3× ED Effect",
+            fde: "Best in Group · Turned 7.7M Records Into One Actionable Recommendation, Presented to Judges",
+          },
+        },
+        { name: "Hackathons", detail: "10+ Hackathons · 4 Awards", views: ["engineering"] },
+        {
+          name: "Leadership",
+          detail: "RHA Treasurer ($130,000 Budget) · Resident Assistant · Hindu YUVA Secretary & Treasurer",
+          views: ["fde"],
+        },
       ],
     },
   ],
