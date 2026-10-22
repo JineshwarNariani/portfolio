@@ -217,6 +217,10 @@ body {
   transition: opacity 0.26s ease, translate 0.26s var(--ease-out);
   translate: 0 3px;
 }
+/* Keeps titles legible when a guest feather drifts behind them. */
+.label :is(.label-main, .label-micro) {
+  text-shadow: 0 0 3px var(--color-paper), 0 0 3px var(--color-paper), 0 0 6px var(--color-paper);
+}
 .label[data-visible] {
   opacity: 1;
   translate: 0 0;

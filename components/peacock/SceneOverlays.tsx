@@ -1,5 +1,6 @@
 "use client";
 
+import { useLayoutEffect, useRef } from "react";
 import { interactiveFeathers, type FeatherId } from "@/data/featherConfig";
 import { animationConfig } from "@/lib/animationConfig";
 import { peacockArt } from "@/lib/peacock/art.generated";
@@ -7,13 +8,30 @@ import { axis, toScreen, type GroupPose } from "@/lib/peacock/layout";
 
 /**
  * Hover/focus labels. Each sits just beyond its feather's tip, outside the fan,
- * so it never covers the artwork. Only the active one is visible.
+ * so it never covers the artwork. Only the active one is visible. On narrow
+ * screens all titles share the slot above the centre feather.
  */
-export function FeatherLabel({ id, group }: { id: FeatherId | null; group: GroupPose }) {
+export function FeatherLabel({ id, group, compact }: { id: FeatherId | null; group: GroupPose; compact: boolean }) {
+  const box = useRef<HTMLDivElement>(null);
+
+  // On narrow screens a side feather's tip is near the edge: nudge the visible
+  // title sideways just enough to keep it fully on screen.
+  useLayoutEffect(() => {
+    const el = box.current?.querySelector<HTMLElement>(`[data-id="${id}"]`);
+    if (!el) return;
+    el.style.marginLeft = "0px";
+    const r = el.getBoundingClientRect();
+    const margin = 12;
+    const shift = r.left < margin ? margin - r.left : r.right > window.innerWidth - margin ? window.innerWidth - margin - r.right : 0;
+    el.style.marginLeft = `${shift}px`;
+  }, [id, group, compact]);
+
   return (
-    <div className="labels" aria-hidden="true">
+    <div className="labels" aria-hidden="true" ref={box}>
       {interactiveFeathers.map((f) => {
-        const art = peacockArt.feathers[f.featherIndex];
+        // On narrow screens the fan fills the width, so every title shares one
+        // slot above the centre feather instead of crowding a side feather's tip.
+        const art = peacockArt.feathers[compact ? CENTRE_INDEX : f.featherIndex];
         const [dx, dy] = axis(art);
         const [tx, ty] = toScreen(group, art.tip);
         const gap = animationConfig.hover.offset + 14;
@@ -21,6 +39,7 @@ export function FeatherLabel({ id, group }: { id: FeatherId | null; group: Group
         return (
           <div
             key={f.id}
+            data-id={f.id}
             className="label"
             data-visible={id === f.id || undefined}
             data-align={align}
@@ -35,6 +54,8 @@ export function FeatherLabel({ id, group }: { id: FeatherId | null; group: Group
     </div>
   );
 }
+
+const CENTRE_INDEX = interactiveFeathers.find((f) => f.id === "founder")!.featherIndex;
 
 export type CueMode = "select" | "about" | null;
 

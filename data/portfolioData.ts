@@ -89,8 +89,36 @@ export const sections: Record<FeatherId, SectionContent> = {
     ],
   },
   projects: {
-    intro: "Mostly built at hackathons — 10+ so far, several of them winners.",
+    intro: "Grounded AI products, data tools for vision and world models, and hackathon builds — 10+ hackathons so far, several of them winners.",
     entries: [
+      {
+        title: "ClaimCheck",
+        meta: "Fact-Checks Claims Against a Product’s Own Docs · Live App",
+        body: "Paste a launch post, landing-page copy or an answer an AI assistant gave about a developer tool; ClaimCheck splits it into claims and gives each one a verdict — supported, contradicted, not in docs or unverifiable — with the doc passage behind it. The rule the whole app is built on: a verdict stands only if its quote appears word for word in the docs. The model proposes verdicts and quotes; deterministic code checks every quote and downgrades any it can’t find. Claude Haiku splits the text, hybrid search finds passages, Claude Sonnet judges, verdicts stream in live, a teammate reviews them, and a weekly job re-reads cited pages and flags evidence that has disappeared. Across 45 judged claims in three test runs it produced zero false “supported” verdicts, and every model choice was made on measured cost.",
+        tags: ["TypeScript", "React", "Claude Sonnet", "Claude Haiku", "RAG", "Grounding", "Firecrawl", "Background Jobs", "RBAC", "Evals", "Vitest", "Playwright"],
+        links: [
+          { label: "Live app", href: "https://claimcheck.app.space" },
+          { label: "GitHub", href: "https://github.com/JineshwarNariani/claimcheck" },
+        ],
+      },
+      {
+        title: "Recruiter Search",
+        meta: "Full-Stack AI Talent Search · Next.js, Supabase, Stripe",
+        body: "Recruiters describe who they want in plain English; Claude Haiku turns the brief into structured filters (role, seniority, city, skills, employers, school, years, open to work) and one static SQL query finds the people. The model never sees candidates, and it can’t invent filters: every field is an enum of values that exist in the data, anything the data can’t check is returned as “unsupported” rather than guessed, and the server re-validates and clamps every output. Searches are charged atomically under a row lock so concurrent requests can’t overspend a free plan, results are snapshotted for fast stable paging (~40 ms), and editing a filter re-runs the search without the model. Row-level security isolates each company, and Stripe webhooks are signature-checked, deduplicated and applied in order. About $0.0002 per search with prompt caching.",
+        tags: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Row-Level Security", "Stripe", "Claude Haiku", "Structured Outputs", "Zod", "Prompt Caching"],
+      },
+      {
+        title: "Kausal",
+        meta: "Action–Video Causality for World-Model Training Data",
+        body: "A world model learns what happens next from gameplay recordings — but only if the logged actions actually cause what’s on screen. Kausal measures that for any game: it reads the camera’s response with phase correlation, finds the lag, gain and coherence between mouse input and motion, and tests it with a permutation test and false-discovery control, then drops or repairs desynced windows. Built as an operator for the Kuration SDK and run on 11.8 hours of Open P2P gameplay plus 30 CS:GO recordings. Where the SDK’s built-in check flagged 0–30% of desynced clips, Kausal flagged 100% with the exact lag and no false alarms; it found Quake recordings logged a frame late, and filtering a contaminated corpus improved a downstream inverse-dynamics model (62.0% vs 59.9%, p ≈ 0.009).",
+        tags: ["Python", "Computer Vision", "World Models", "Phase Correlation", "Permutation Testing", "FDR Control", "PyTorch", "FFmpeg", "Data Curation"],
+      },
+      {
+        title: "Model’s-Eye Transcoding",
+        meta: "When Is Lossy Video Compression Worth It for a VLM?",
+        body: "A vision-language model never sees your video file — it sees 32×32-pixel, two-frame tubelets sampled at about 2 fps. So the right format is the model’s own input grid, and the real cost of a large file is decode work the sampler throws away. Re-encoding to Qwen3-VL’s grid (672×384, 2 fps, H.264 CRF 33) makes files 18% of the original size and 6.4× cheaper to read, with no significant accuracy loss across 270 VideoMME questions (2,160 VLM answers, cluster bootstrap and McNemar tests against a timestamp-jitter noise floor). It pays for itself after 1.6 reads; the usual “just use HEVC” answer makes every read slower. Includes a metadata-only decision rule that triages a corpus over HTTP range requests without downloading it.",
+        tags: ["Python", "VLMs", "Qwen3-VL", "MLX", "FFmpeg", "H.264 / HEVC", "Statistical Testing", "Cost Modelling"],
+      },
       {
         title: "Clause",
         meta: "AI Legal-Enforcement Platform · Best Use of AI Winner",
@@ -204,6 +232,13 @@ export const sections: Record<FeatherId, SectionContent> = {
         tags: ["VMD-LSTM", "Granger Causality", "Time Series", "Mutual Information", "Random Forest", "Econometrics", "Forecasting"],
       },
       {
+        title: "Cross-Domain Causal Transfer via Kan Extensions",
+        meta: "CMPSCI 692CT: Category Theory for AGI · UMass Amherst · Spring 2026",
+        body: "An empirical test of Kan-Do-Calculus, the category-theoretic account of transferring causal knowledge between domains. I extracted causal triples from three real corpora — Federal Reserve documents, SEC enforcement releases and PubMed papers — then predicted causal graphs for 20 held-out queries with left and right Kan extensions, soft versions of each, and a retrieval baseline, scored on seven evaluation dimensions. Left Kan beat Right Kan on every dimension, confirming the predicted coend/end asymmetry; domain proximity predicted whether transfer happened at all; and the soft variants showed that the bottleneck is vocabulary grounding, not selectivity. Run on the UMass Unity cluster.",
+        tags: ["Category Theory", "Causal Inference", "Kan Extensions", "LLMs", "Sentence Transformers", "NetworkX", "Evaluation Design", "SLURM / HPC"],
+        links: [{ label: "GitHub", href: "https://github.com/JineshwarNariani/kan-extension-transfer" }],
+      },
+      {
         title: "Program Synthesis vs. LLMs",
         meta: "Undergraduate Research Volunteer · UMass Amherst · Dec 2023 – Jan 2024",
         body: "Can a classical program synthesiser still compete with a large language model? I built program synthesisers with Rosette, a solver-aided language, and evaluated them against LLMs on the same programming tasks.",
@@ -270,6 +305,11 @@ export const sections: Record<FeatherId, SectionContent> = {
         links: [{ label: "Ceremony", href: "https://www.cics.umass.edu/academics/commencement/senior-celebration" }],
       },
       {
+        title: "Cross-Domain Causal Transfer via Kan Extensions: The Coend / End Asymmetry",
+        meta: "Project Report · CMPSCI 692CT, UMass Amherst · 2026",
+        links: [{ label: "Report", href: "https://github.com/JineshwarNariani/kan-extension-transfer" }],
+      },
+      {
         title: "Strategic Deception in Financial Markets: Decoy Trading and the Limits of Adversarial Detection",
         meta: "Honors Thesis · Commonwealth Honors College",
       },
@@ -305,6 +345,10 @@ export const quickView = {
     {
       title: "Selected Projects",
       items: [
+        { name: "ClaimCheck", detail: "Live App · Claude, RAG, Grounding, Firecrawl, TypeScript, Evals" },
+        { name: "Recruiter Search", detail: "Next.js, Supabase, PostgreSQL RLS, Stripe, Claude Structured Outputs" },
+        { name: "Kausal", detail: "Computer Vision, World Models, Permutation Testing, PyTorch" },
+        { name: "Model’s-Eye Transcoding", detail: "VLMs, Qwen3-VL, FFmpeg, Statistical Testing, Cost Modelling" },
         { name: "Clause", detail: "Best Use of AI Winner · Snowflake Cortex RAG, Gemini, FastAPI, MCP, Solana" },
         { name: "Maple AI", detail: "Best AI Project with Databricks Winner · Hume EVI, Databricks, LangChain, Next.js" },
         { name: "EchoHands", detail: "Two Awards at HackHer · MediaPipe, PyTorch, TensorFlow, RAG, Next.js" },
@@ -321,6 +365,7 @@ export const quickView = {
         { name: "PRISM", detail: "Agentic Systems, LangGraph, MCP, RAG, Evals" },
         { name: "Financial RL", detail: "Paper Proposal Accepted at IEEE IDS 2025 · MARL, AIRL, Portfolio Optimization" },
         { name: "Tariff-Policy Forecasting", detail: "Co-Authored Paper · VMD-LSTM, Granger Causality, Time Series, Forecasting" },
+        { name: "Kan Extensions for Causal Transfer", detail: "Category Theory, Causal Inference, LLMs, HPC" },
         { name: "Program Synthesis vs. LLMs", detail: "Program Synthesis, Rosette, LLM Evaluation" },
       ],
     },

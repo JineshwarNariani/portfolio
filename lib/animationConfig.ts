@@ -35,6 +35,17 @@ export const animationConfig = {
     shortFactor: 0.45,
     ease: [0.3, 0.75, 0.25, 1] as const,
   },
+  /**
+   * While the peacock rests and nothing is hovered, each section feather in turn
+   * shows its title and leans out slightly — so visitors learn the feathers are
+   * the navigation. Pauses on hover/focus and while the tab is hidden.
+   */
+  labelTour: {
+    /** Seconds after the fan settles before the first title appears. */
+    startDelay: 2.6,
+    /** Seconds each feather's title stays up before the next one. */
+    interval: 1.4,
+  },
   hover: {
     /** Outward shift along the feather's axis. */
     offset: 9,

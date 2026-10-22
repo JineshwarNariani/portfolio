@@ -64,6 +64,12 @@ export function PeacockScene() {
   const [state, dispatch] = usePeacockState();
   const [values] = useState(() => createPeacockValues(fitPose(vp)));
   const [hover, setHover] = useState<FeatherId | "about" | null>(null);
+  // Index into interactiveFeathers of the feather currently "touring" its title, or null.
+  const [tour, setTour] = useState<number | null>(null);
+  const hoverRef = useRef(hover);
+  useEffect(() => {
+    hoverRef.current = hover;
+  });
   // One gentle gold outline on the chest after the first unfurl of a session.
   const [chestHint, setChestHint] = useState(false);
 
@@ -198,6 +204,37 @@ export function PeacockScene() {
     if (s.type === "sectionOpen") snapStable(values, vp, { type: "sectionOpen", idx: featherById[s.id].featherIndex });
   }, [vp, values]);
 
+  // --- Label tour: titles cycle round the fan while the peacock rests -------------
+  const resting = state.type === "idle" && hover === null;
+  const touringId = resting && tour !== null ? interactiveFeathers[tour].id : null;
+  const tourStarted = useRef(false);
+  useEffect(() => {
+    if (!resting) return;
+    const { startDelay, interval } = animationConfig.labelTour;
+    let timer: number;
+    const tick = (delay: number) => {
+      timer = window.setTimeout(() => {
+        if (!document.hidden) setTour((t) => (t === null ? 0 : (t + 1) % interactiveFeathers.length));
+        tick(interval * 1000);
+      }, delay);
+    };
+    // First visit to rest waits for the fan to settle; after a hover it carries on promptly.
+    tick((tourStarted.current ? interval : startDelay) * 1000);
+    tourStarted.current = true;
+    return () => window.clearTimeout(timer);
+  }, [resting]);
+
+  // The touring feather leans out exactly as on hover, so the title is tied to its feather.
+  useEffect(() => {
+    if (!touringId) return;
+    const idx = featherById[touringId].featherIndex;
+    hoverFeather(values, idx, true, ctx());
+    return () => {
+      // Leave it alone if the visitor has just moved onto this same feather.
+      if (hoverRef.current !== touringId) hoverFeather(values, idx, false, ctx());
+    };
+  }, [touringId, values]);
+
   // --- Interaction ------------------------------------------------------------
   const navigate = useCallback(
     (href: string) => (e: MouseEvent<HTMLAnchorElement>) => {
@@ -297,7 +334,7 @@ export function PeacockScene() {
         </g>
       </svg>
 
-      <FeatherLabel id={idle && hover && hover !== "about" ? hover : null} group={fit} />
+      <FeatherLabel id={idle && hover && hover !== "about" ? hover : touringId} group={fit} compact={vp.w < 700} />
       <SceneCue mode={idle ? (hover === "about" ? "about" : "select") : null} group={fit} />
 
       <AnimatePresence>
