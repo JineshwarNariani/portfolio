@@ -244,7 +244,7 @@ export function trackQuickViewClosed(closeMethod: CloseMethod) {
 // ---------------------------------------------------------------------------
 // Links (resume + profiles). Destination URLs are never sent.
 // ---------------------------------------------------------------------------
-export type LinkKind = "resume" | "linkedin" | "github" | "email" | "twitter" | "devpost";
+export type LinkKind = "resume" | "linkedin" | "github" | "email" | "twitter" | "devpost" | "spotify";
 
 export function linkKindFromLabel(label: string): LinkKind | null {
   const l = label.toLowerCase();
@@ -254,6 +254,7 @@ export function linkKindFromLabel(label: string): LinkKind | null {
   if (l.startsWith("email")) return "email";
   if (l.startsWith("x ") || l.startsWith("x/") || l.includes("twitter")) return "twitter";
   if (l.startsWith("devpost")) return "devpost";
+  if (l.startsWith("spotify")) return "spotify";
   return null;
 }
 

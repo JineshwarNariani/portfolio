@@ -270,6 +270,7 @@ const ACTIVITY_EVENTS = [
   "email_clicked",
   "twitter_clicked",
   "devpost_clicked",
+  "spotify_clicked",
   "audio_enabled",
   "guestbook_opened",
   "guestbook_submitted",
@@ -298,6 +299,8 @@ export function describeEvent(event: string, feather: string | null) {
       return "X / Twitter clicked";
     case "devpost_clicked":
       return "Devpost clicked";
+    case "spotify_clicked":
+      return "Spotify clicked";
     case "audio_enabled":
       return "Flute turned on";
     case "guestbook_opened":

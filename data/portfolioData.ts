@@ -28,6 +28,7 @@ export const profile = {
     { label: "GitHub", href: "https://github.com/JineshwarNariani" },
     { label: "X / Twitter", href: "https://x.com/thejinu22" },
     { label: "Devpost", href: "https://devpost.com/JineshwarNariani" },
+    { label: "Spotify", href: "https://open.spotify.com/user/sfu6z8abrj8p5eodxu3gojzwz" },
     { label: "Resume", href: RESUME },
     { label: "Email", href: "mailto:jineshwarkn@gmail.com" },
   ],

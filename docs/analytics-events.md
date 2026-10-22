@@ -83,7 +83,7 @@ strings or URL fragments, the raw user-agent string. `before_send` in
 ### `resume_clicked`
 **Properties:** `location`, `action` (`open`), `route`.
 
-### `linkedin_clicked` · `github_clicked` · `email_clicked` · `twitter_clicked` · `devpost_clicked`
+### `linkedin_clicked` · `github_clicked` · `email_clicked` · `twitter_clicked` · `devpost_clicked` · `spotify_clicked`
 **Properties:** `location`, `route`.
 
 ## Audio

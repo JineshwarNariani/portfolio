@@ -54,6 +54,7 @@ export interface EventMap {
   email_clicked: { location: LinkLocation; route: string };
   twitter_clicked: { location: LinkLocation; route: string };
   devpost_clicked: { location: LinkLocation; route: string };
+  spotify_clicked: { location: LinkLocation; route: string };
   audio_enabled: { route: string; secondsIntoSession: number; trigger: "toggle" | "first_interaction" };
   audio_disabled: { route: string; enabledDurationSeconds: number };
   guestbook_opened: { openMethod: GuestbookOpenMethod; route: string };
@@ -102,6 +103,7 @@ export const ANALYTICS_EVENTS = [
   "email_clicked",
   "twitter_clicked",
   "devpost_clicked",
+  "spotify_clicked",
   "audio_enabled",
   "audio_disabled",
   "guestbook_opened",
